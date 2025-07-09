@@ -1,0 +1,39 @@
+# .devcontainer/docker-compose.yml
+
+services:
+  setup:
+    build:
+      dockerfile: services/setup/Dockerfile
+    volumes:
+      - ../:/workspace
+    working_dir: /workspace
+    entrypoint: ["/usr/bin/env", "-S", "deno", "--allow-run", "--allow-read", "--allow-write"]
+    command: ["/workspace/.devcontainer/services/setup/entrypoint.ts"]
+  gateway:
+    build:
+      dockerfile: services/gateway/Dockerfile
+    volumes:
+      - ../:/workspace
+      - ../certs:/etc/haproxy/certs
+    working_dir: /workspace
+    entrypoint: ["/usr/bin/env", "-S", "deno", "--allow-run", "--allow-read", "--allow-write"]
+    command: ["/workspace/.devcontainer/services/gateway/entrypoint.ts"]
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    ports:
+      - 443:443
+  shell:
+    build:
+      dockerfile: services/shell/Dockerfile
+    volumes:
+      - ../:/workspace
+      - ./services/shell/.zshrc:/home/vscode/.zshrc
+      - ./services/shell/starship.toml:/home/vscode/.config/starship.toml
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /workspace
+    entrypoint: ["/usr/bin/env", "-S", "deno", "--allow-run"]
+    command: ["/workspace/.devcontainer/services/shell/entrypoint.ts"]
+    depends_on:
+      setup:
+        condition: service_completed_successfully

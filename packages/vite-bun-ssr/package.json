@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "hono": "catalog:",
+    "radashi": "catalog:",
+    "tiny-invariant": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "vite": "catalog:"
+  },
+  "name": "vite-bun-ssr",
+  "private": true,
+  "type": "module"
+}

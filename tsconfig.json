@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "tss": ["packages/tss"],
+      "vite-bun-ssr": ["packages/vite-bun-ssr"]
+    },
+    "strict": true,
+    "target": "ESNext"
+  }
+}

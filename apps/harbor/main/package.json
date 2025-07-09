@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "@evokedset/utils": "catalog:",
+    "@formkit/tempo": "catalog:",
+    "@hono/valibot-validator": "catalog:",
+    "honox": "catalog:",
+    "neverthrow": "catalog:",
+    "radashi": "catalog:",
+    "roughjs": "catalog:",
+    "tiny-invariant": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@mdx-js/rollup": "catalog:",
+    "dotenv": "catalog:",
+    "remark-frontmatter": "catalog:",
+    "remark-gfm": "catalog:",
+    "remark-mdx-frontmatter": "catalog:",
+    "vite": "catalog:"
+  },
+  "name": "harbor/main",
+  "private": true,
+  "scripts": {
+    "build": "vite build --mode client && vite build",
+    "dev": "vite",
+    "serve": "bun dist/server.mjs"
+  },
+  "type": "module"
+}

@@ -1,0 +1,118 @@
+# taskfile.yml
+
+version: '3'
+templates:
+  acimov: &acimov
+    desc: "`{{.cmds}}`"
+    cmds: ['{{.cmds}}']
+tasks:
+  # adaptability
+  adb.dprint.config.update:
+    <<: *acimov
+    vars: { cmds: dprint config update }
+  adb.bun.outdated:
+    <<: *acimov
+    # the current `bun outdated` command does not work at the project root
+    vars: { cmds: bun outdated -F '*' }
+  adb.bun.update:
+    <<: *acimov
+    vars:
+      dirs:
+        sh: find . -name 'package.json' -not -path '*/node_modules/*' -exec dirname {} \; | xargs
+      # since `bun update` does not support filtering yet,
+      # we use `--cwd` to update each directory individually
+      cmds: >
+        for dir in {{.dirs}}; do
+          bun update --cwd "$dir"
+        done
+  adb.bun.catalog.update:
+    <<: *acimov
+    vars:
+      catalog:
+        sh: jq -r '.workspaces.catalog | to_entries[] | "\(.key)=\(.value)"' package.json | paste -sd ' '
+      # probably not yet supported in Bun v1.2.18: updating `workspaces.catalog` versions
+      # this loop updates them manually
+      cmds: >
+        for entry in {{.catalog}}; do
+          name=${entry%%=*}
+          current=${entry#*=}
+          latest=$(bun pm view "$name" version)
+          if [ "${current#^}" != "$latest" ]; then
+            echo "⬆️  $name: $current → ^$latest"
+            jq ".workspaces.catalog[\"$name\"] = \"^$latest\"" package.json | sponge package.json
+          else
+            echo "✅ $name is up to date ($current)"
+          fi
+        done
+  adb.claude.code:
+    <<: *acimov
+    # it fails via task, so for now i'll just run it from the bunx command normally
+    vars: { cmds: bunx @anthropic-ai/claude-code }
+  # confidentiality
+  cfi.dotenvx.encrypt:
+    <<: *acimov
+    vars: { cmds: dotenvx encrypt .env }
+  cfi.dotenvx.decrypt:
+    <<: *acimov
+    vars: { cmds: dotenvx decrypt .env }
+  # integrity
+  int.bun.audit:
+    <<: *acimov
+    vars: { cmds: bun audit }
+  int.bun.eslint:
+    <<: *acimov
+    vars: { cmds: bun eslint }
+  int.bun.patch.honox:
+    <<: *acimov
+    vars:
+      package: honox
+      from: /\\/app/g
+      to: /src
+      cmds: >
+        bun patch {{.package}};
+        bunx replace-in-file {{.from}} {{.to}} node_modules/{{.package}}/dist/**/*.{js,d.ts};
+        bun patch --commit 'node_modules/{{.package}}'
+  int.bun.patch.@hono/vite-dev-server:
+    <<: *acimov
+    vars:
+      package: '@hono/vite-dev-server'
+      from: return inject
+      to: return response; // inject
+      file: node_modules/{{.package}}/dist/dev-server.js
+      cmds: >
+        bun patch {{.package}};
+        bunx replace-in-file '{{.from}}' '{{.to}}' {{.file}};
+        bun patch --commit 'node_modules/{{.package}}';
+  int.bunx.madge:
+    <<: *acimov
+    vars:
+      extensions: ts,tsx
+      cmds: bunx madge --circular --extensions '{{.extensions}}' .
+  # mobility
+  mob.bun.harbor.dev:
+    <<: *acimov
+    vars: { cmds: bun -F harbor/main dev }
+  # observability
+  obs.pkgx.cloc:
+    <<: *acimov
+    vars:
+      ignore: node_modules
+      exclude: JavaScript,XML
+      cmds: pkgx cloc . --fullpath --not-match-d='{{.ignore}}' --exclude-lang={{.exclude}}
+  obs.bunx.tree:
+    <<: *acimov
+    vars:
+      level: 7
+      ignore: .DS_Store,.git,.deno,node_modules
+      cmds: bunx tree-cli -l {{.level}} -a --ignore '{{.ignore}}'
+  # visibility
+  vis.task.time:
+    <<: *acimov
+    vars:
+      cmds:
+        bun -e '
+          import stht from "seconds-to-human-time";
+          const [f, n] = [".task", Date.now()];
+          try { const l = +await Bun.file(f).text(); console.log("\n" + stht((n - l) / 1000)) } catch {};
+          await Bun.write(f, String(n));
+        '

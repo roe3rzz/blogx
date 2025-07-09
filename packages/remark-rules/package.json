@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "radashi": "catalog:"
+  },
+  "name": "remark-rules",
+  "private": true,
+  "scripts": {
+    "build": "bun build index.ts --outfile index.js"
+  },
+  "type": "module"
+}

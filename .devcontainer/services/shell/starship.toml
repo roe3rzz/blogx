@@ -1,0 +1,10 @@
+# .devcontainer/services/shell/starship.toml
+
+[git_branch]
+symbol = "🌱 "
+
+[bun]
+symbol = "🥟 "
+
+[container]
+symbol = "🐳 "

@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "hono": "catalog:",
+    "radashi": "catalog:",
+    "tiny-invariant": "catalog:"
+  },
+  "devDependencies": {
+    "@pandacss/dev": "catalog:"
+  },
+  "name": "tss",
+  "private": true,
+  "type": "module"
+}

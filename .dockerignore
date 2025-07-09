@@ -1,0 +1,12 @@
+# .dockerignore
+
+# artifacts
+dist
+# dependencies
+node_modules
+# garbage
+.task
+# secrets
+.env
+.env.keys
+certs

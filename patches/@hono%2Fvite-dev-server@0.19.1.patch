@@ -1,0 +1,16 @@
+diff --git a/node_modules/@hono/vite-dev-server/.bun-tag-1e5a2de9588132e1 b/.bun-tag-1e5a2de9588132e1
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/dev-server.js b/dist/dev-server.js
+index 94995adb5d3d86e03eb2eadb76eedc66164fa0b5..f68948694674ea9a4f5a1e6c8ee3295ef8021a4c 100644
+--- a/dist/dev-server.js
++++ b/dist/dev-server.js
+@@ -112,7 +112,7 @@ function devServer(options) {
+               if (options?.injectClientScript !== false && response.headers.get("content-type")?.match(/^text\/html/)) {
+                 const nonce = response.headers.get("content-security-policy")?.match(/'nonce-([^']+)'/)?.[1];
+                 const script = `<script${nonce ? ` nonce="${nonce}"` : ""}>import("/@vite/client")</script>`;
+-                return injectStringToResponse(response, script) ?? response;
++                return response; // injectStringToResponse(response, script) ?? response;
+               }
+               return response;
+             },

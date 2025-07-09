@@ -1,0 +1,252 @@
+diff --git a/dist/client/client.js b/dist/client/client.js
+index 5cd62e448dcc56ab0f35f997ba9e74de7ef8228f..cbebc5d1f8c92f77fb6ce67e30479cdc7265d42e 100644
+--- a/dist/client/client.js
++++ b/dist/client/client.js
+@@ -7,9 +7,9 @@ import {
+ } from "../constants.js";
+ const createClient = async (options) => {
+   const FILES = options?.ISLAND_FILES ?? {
+-    ...import.meta.glob("/app/islands/**/[a-zA-Z0-9-]+.tsx"),
+-    ...import.meta.glob("/app/**/_[a-zA-Z0-9-]+.island.tsx"),
+-    ...import.meta.glob("/app/**/$[a-zA-Z0-9-]+.tsx")
++    ...import.meta.glob("/src/islands/**/[a-zA-Z0-9-]+.tsx"),
++    ...import.meta.glob("/src/**/_[a-zA-Z0-9-]+.island.tsx"),
++    ...import.meta.glob("/src/**/$[a-zA-Z0-9-]+.tsx")
+   };
+   const hydrateComponent = async (document2) => {
+     const filePromises = Object.keys(FILES).map(async (filePath) => {
+diff --git a/dist/server/with-defaults.js b/dist/server/with-defaults.js
+index 43685128eb8adb68384f1e52703d516ca50d4b64..2da2c602b7c64d6a0e767f5f51cf12c73954ca0f 100644
+--- a/dist/server/with-defaults.js
++++ b/dist/server/with-defaults.js
+@@ -1,27 +1,27 @@
+ import { createApp as baseCreateApp } from "./server.js";
+ const createApp = (options) => {
+   const newOptions = {
+-    root: options?.root ?? "/app/routes",
++    root: options?.root ?? "/src/routes",
+     app: options?.app,
+     init: options?.init,
+     trailingSlash: options?.trailingSlash,
+-    NOT_FOUND: options?.NOT_FOUND ?? import.meta.glob("/app/routes/**/_404.(ts|tsx)", {
++    NOT_FOUND: options?.NOT_FOUND ?? import.meta.glob("/src/routes/**/_404.(ts|tsx)", {
+       eager: true
+     }),
+-    ERROR: options?.ERROR ?? import.meta.glob("/app/routes/**/_error.(ts|tsx)", {
++    ERROR: options?.ERROR ?? import.meta.glob("/src/routes/**/_error.(ts|tsx)", {
+       eager: true
+     }),
+-    RENDERER: options?.RENDERER ?? import.meta.glob("/app/routes/**/_renderer.tsx", {
++    RENDERER: options?.RENDERER ?? import.meta.glob("/src/routes/**/_renderer.tsx", {
+       eager: true
+     }),
+-    MIDDLEWARE: options?.MIDDLEWARE ?? import.meta.glob("/app/routes/**/_middleware.(ts|tsx)", {
++    MIDDLEWARE: options?.MIDDLEWARE ?? import.meta.glob("/src/routes/**/_middleware.(ts|tsx)", {
+       eager: true
+     }),
+     ROUTES: options?.ROUTES ?? import.meta.glob(
+       [
+-        "/app/routes/**/!(_*|-*|$*|*.test|*.spec).(ts|tsx|md|mdx)",
+-        "/app/routes/.well-known/**/!(_*|-*|$*|*.test|*.spec).(ts|tsx|md|mdx)",
+-        "!/app/routes/**/-*/**/*"
++        "/src/routes/**/!(_*|-*|$*|*.test|*.spec).(ts|tsx|md|mdx)",
++        "/src/routes/.well-known/**/!(_*|-*|$*|*.test|*.spec).(ts|tsx|md|mdx)",
++        "!/src/routes/**/-*/**/*"
+       ],
+       {
+         eager: true
+diff --git a/dist/utils/file.test.js b/dist/utils/file.test.js
+index 0be9112dd0622211b99c65d206a2db2d1616c1b4..2207ee644088c940e9286dec032070cb92916b2a 100644
+--- a/dist/utils/file.test.js
++++ b/dist/utils/file.test.js
+@@ -29,24 +29,24 @@ describe("filePathToPath", () => {
+ });
+ describe("groupByDirectory", () => {
+   const files = {
+-    "/app/routes/index.tsx": "file1",
+-    "/app/routes/about.tsx": "file2",
+-    "/app/routes/blog/index.tsx": "file3",
+-    "/app/routes/blog/about.tsx": "file4",
+-    "/app/routes/blog/posts/index.tsx": "file5",
+-    "/app/routes/blog/posts/comments.tsx": "file6"
++    "/src/routes/index.tsx": "file1",
++    "/src/routes/about.tsx": "file2",
++    "/src/routes/blog/index.tsx": "file3",
++    "/src/routes/blog/about.tsx": "file4",
++    "/src/routes/blog/posts/index.tsx": "file5",
++    "/src/routes/blog/posts/comments.tsx": "file6"
+   };
+   it("Should group by directories", () => {
+     expect(groupByDirectory(files)).toEqual({
+-      "/app/routes": {
++      "/src/routes": {
+         "index.tsx": "file1",
+         "about.tsx": "file2"
+       },
+-      "/app/routes/blog": {
++      "/src/routes/blog": {
+         "index.tsx": "file3",
+         "about.tsx": "file4"
+       },
+-      "/app/routes/blog/posts": {
++      "/src/routes/blog/posts": {
+         "index.tsx": "file5",
+         "comments.tsx": "file6"
+       }
+@@ -97,18 +97,18 @@ describe("sortDirectoriesByDepth", () => {
+ describe("listByDirectory", () => {
+   it("Should list files by their directory", () => {
+     const files = {
+-      "/app/routes/blog/posts/_renderer.tsx": "foo3",
+-      "/app/routes/_renderer.tsx": "foo",
+-      "/app/routes/blog/_renderer.tsx": "foo2"
++      "/src/routes/blog/posts/_renderer.tsx": "foo3",
++      "/src/routes/_renderer.tsx": "foo",
++      "/src/routes/blog/_renderer.tsx": "foo2"
+     };
+     const result = listByDirectory(files);
+     expect(result).toEqual({
+-      "/app/routes": ["/app/routes/_renderer.tsx"],
+-      "/app/routes/blog": ["/app/routes/blog/_renderer.tsx", "/app/routes/_renderer.tsx"],
+-      "/app/routes/blog/posts": [
+-        "/app/routes/blog/posts/_renderer.tsx",
+-        "/app/routes/blog/_renderer.tsx",
+-        "/app/routes/_renderer.tsx"
++      "/src/routes": ["/src/routes/_renderer.tsx"],
++      "/src/routes/blog": ["/src/routes/blog/_renderer.tsx", "/src/routes/_renderer.tsx"],
++      "/src/routes/blog/posts": [
++        "/src/routes/blog/posts/_renderer.tsx",
++        "/src/routes/blog/_renderer.tsx",
++        "/src/routes/_renderer.tsx"
+       ]
+     });
+   });
+diff --git a/dist/vite/client.js b/dist/vite/client.js
+index 3de1b0fdf7f80d2f1f56499239269b05b24eeca6..ebf33dcf284a2fdd36926f79dde422fe43db5014 100644
+--- a/dist/vite/client.js
++++ b/dist/vite/client.js
+@@ -17,7 +17,7 @@ function client(options) {
+       return {
+         build: {
+           rollupOptions: {
+-            input: ["/app/client.ts", ...input]
++            input: ["/src/client.ts", ...input]
+           },
+           assetsDir: options?.assetsDir ?? defaultOptions.assetsDir,
+           manifest: true
+diff --git a/dist/vite/index.js b/dist/vite/index.js
+index fa3b64cdf7b03dc12fe1338f87e9c302266d8ed9..c3347e99b0ba015d0ab54117e4f56b64230354b5 100644
+--- a/dist/vite/index.js
++++ b/dist/vite/index.js
+@@ -6,13 +6,13 @@ import { islandComponents } from "./island-components.js";
+ import { restartOnAddUnlink } from "./restart-on-add-unlink.js";
+ const defaultOptions = {
+   islands: true,
+-  entry: path.join(process.cwd(), "./app/server.ts")
++  entry: path.join(process.cwd(), "./src/server.ts")
+ };
+ const devServerDefaultOptions = {
+   ...viteDevServerDefaultOptions,
+   exclude: [
+     ...viteDevServerDefaultOptions.exclude,
+-    /^\/app\/.+\.tsx?/,
++    /^\/src\/.+\.tsx?/,
+     /^\/favicon.ico/,
+     /^\/static\/.+/
+   ],
+diff --git a/dist/vite/inject-importing-islands.js b/dist/vite/inject-importing-islands.js
+index 65b999cdb47eebfb961450c7a26e1ef461c0292e..ba0768ef522623c5d687db7f2b53fa405491afd2 100644
+--- a/dist/vite/inject-importing-islands.js
++++ b/dist/vite/inject-importing-islands.js
+@@ -9,7 +9,7 @@ import { matchIslandComponentId } from "./utils/path.js";
+ const generate = _generate.default ?? _generate;
+ async function injectImportingIslands(options) {
+   let appPath = "";
+-  const islandDir = options?.islandDir ?? "/app/islands";
++  const islandDir = options?.islandDir ?? "/src/islands";
+   let root = "";
+   let config;
+   const resolvedCache = /* @__PURE__ */ new Map();
+@@ -40,7 +40,7 @@ async function injectImportingIslands(options) {
+     name: "inject-importing-islands",
+     configResolved: async (resolveConfig) => {
+       config = resolveConfig;
+-      appPath = path.join(config.root, options?.appDir ?? "/app");
++      appPath = path.join(config.root, options?.appDir ?? "/src");
+       root = config.root;
+     },
+     async transform(sourceCode, id) {
+diff --git a/dist/vite/island-components.js b/dist/vite/island-components.js
+index 01baefec1c8227286d41697aba602ccd39a4e3b6..f1e0ebc214d68d03faabbc187f0e9c1873cf3aee 100644
+--- a/dist/vite/island-components.js
++++ b/dist/vite/island-components.js
+@@ -158,7 +158,7 @@ const transformJsxTags = (contents, componentName) => {
+ function islandComponents(options) {
+   let root = "";
+   let reactApiImportSource = options?.reactApiImportSource;
+-  const islandDir = options?.islandDir ?? "/app/islands";
++  const islandDir = options?.islandDir ?? "/src/islands";
+   return {
+     name: "transform-island-components",
+     configResolved: async (config) => {
+diff --git a/dist/vite/restart-on-add-unlink.js b/dist/vite/restart-on-add-unlink.js
+index 4af14e64b0e492ea44932033013f353d6f9176bd..d22dec3e20cfb56fd6fc8eb8b379e90679725432 100644
+--- a/dist/vite/restart-on-add-unlink.js
++++ b/dist/vite/restart-on-add-unlink.js
+@@ -2,7 +2,7 @@ function restartOnAddUnlink() {
+   return {
+     name: "restart-on-add-unlink",
+     configureServer(server) {
+-      server.watcher.add("/app/**");
++      server.watcher.add("/src/**");
+       server.watcher.on("add", async () => {
+         await server.restart();
+       });
+diff --git a/dist/vite/sitemap.d.ts b/dist/vite/sitemap.d.ts
+index d6ef3c57b1539c5740c401e0cd3e984b644bcec3..0ec04ae7bd7f4bc5339a79385e3c83fae664e3c3 100644
+--- a/dist/vite/sitemap.d.ts
++++ b/dist/vite/sitemap.d.ts
+@@ -18,7 +18,7 @@ type Frequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+  * @param {Record<string, string>} [options.frequency] - The frequency of the pages.
+  * @param {Record<string, string>} [options.priority] - The priority of the pages.
+  * @param {string} [options.outputFileName='sitemap.xml'] - The name of the output file.
+- * @param {string} [options.routesDir='/app/routes'] - The directory where the routes are located.
++ * @param {string} [options.routesDir='/src/routes'] - The directory where the routes are located.
+  * @returns {Plugin}
+  * @example
+  * ```ts
+diff --git a/dist/vite/sitemap.js b/dist/vite/sitemap.js
+index d4f0428aa75be599dfe358f13d961928b9ff8256..a833402e95b20fec9134f47755464eb129d6927e 100644
+--- a/dist/vite/sitemap.js
++++ b/dist/vite/sitemap.js
+@@ -6,7 +6,7 @@ const defaultOptions = {
+   frequency: {},
+   priority: {},
+   outputFileName: "sitemap.xml",
+-  routesDir: "/app/routes"
++  routesDir: "/src/routes"
+ };
+ const tsFiles = [];
+ function sitemap(options) {
+@@ -16,7 +16,7 @@ function sitemap(options) {
+   const frequency = options?.frequency ?? defaultOptions.frequency ?? {};
+   const priority = options?.priority ?? defaultOptions.priority ?? {};
+   const outputFileName = options?.outputFileName ?? defaultOptions.outputFileName ?? "sitemap.xml";
+-  const routesDir = options?.routesDir ?? defaultOptions.routesDir ?? "/app/routes";
++  const routesDir = options?.routesDir ?? defaultOptions.routesDir ?? "/src/routes";
+   return {
+     name: "vite-plugin-hono-sitemap",
+     apply: "build",
+@@ -57,9 +57,9 @@ ${routes.map(
+ }
+ function isFilePathMatch(filePath, exclude) {
+   const patterns = [
+-    ".*/app/routes/(?!.*(_|\\$|\\.test|\\.spec))[^/]+\\.(tsx|md|mdx)$",
+-    ".*/app/routes/.+/(?!.*(_|\\$|\\.test|\\.spec))[^/]+\\.(tsx|md|mdx)$",
+-    ".*/app/routes/\\.well-known/(?!.*(_|\\$|\\.test|\\.spec))[^/]+\\.(tsx|md|mdx)$"
++    ".*/src/routes/(?!.*(_|\\$|\\.test|\\.spec))[^/]+\\.(tsx|md|mdx)$",
++    ".*/src/routes/.+/(?!.*(_|\\$|\\.test|\\.spec))[^/]+\\.(tsx|md|mdx)$",
++    ".*/src/routes/\\.well-known/(?!.*(_|\\$|\\.test|\\.spec))[^/]+\\.(tsx|md|mdx)$"
+   ];
+   const normalizedPath = path.normalize(filePath).replace(/\\/g, "/");
+   if (exclude.some((excludePath) => normalizedPath.includes(excludePath))) {
