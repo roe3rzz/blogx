@@ -18,9 +18,9 @@ tasks:
     <<: *acimov
     vars:
       dirs:
-        sh: find . -name 'package.json' -not -path '*/node_modules/*' -exec dirname {} \; | xargs
-      # since `bun update` does not support filtering yet,
-      # we use `--cwd` to update each directory individually
+        sh: find "$PWD" -name 'package.json' -not -path '*/node_modules/*' -exec dirname {} \; | xargs
+      # since bun update does not support filtering yet,
+      # we use --cwd to update each directory individually
       cmds: >
         for dir in {{.dirs}}; do
           bun update --cwd "$dir"
